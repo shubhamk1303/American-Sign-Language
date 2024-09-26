@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block data %}
+<link rel="stylesheet" href={{url_for('static',filename='css/sign-to-text.css')}} />
+
+      <button class="toggle">
+        <div class="toggle-child"></div>
+        <div class="toggle-item"></div>
+        <div class="sign-to-text1">SIGN TO TEXT</div>
+      </button>
+      <video class="view-win" controls>
+        <source src />
+      </video>
+      <div class="text-win">
+        <textarea class="text-win-child"> </textarea>
+        <i class="sample-text-goes">Sample text goes here....</i>
+        <div class="translated-text">TRANSLATED TEXT</div>
+
+      </div>
+
+{% endblock %}

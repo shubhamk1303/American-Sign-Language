@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block data%}
+        <div class="signtotext">
+            <div class="main">
+                <div class="sign main-el">
+                    <p class="sub-el">VIEWING WINDOW</p>
+<!--                    <div class="camera sub-el">-->
+<!--                        <img class="camera-icon sub-el" alt="" src={{url_for('static',filename='images/camera.svg')}} />-->
+<!--                    </div>-->
+                    <div class="vid">
+<!--                        <img src="{{ url_for('video_feed') }}" alt="Video Feed">-->
+            <video id="video" width="400" height="350" autoplay></video>
+            <button id="startRecord">Start Recording</button>
+            <button id="stopRecord" disabled>Stop Recording</button>
+            <button id="saveVideo" disabled>Save Video</button>
+            <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+            <form method="post">
+                <button type="submit">Translate</button>
+            </form>
+            <script>
+                document.addEventListener('DOMContentLoaded', (event) => {
+                    const video = document.getElementById('video');
+                    const startRecordButton = document.getElementById('startRecord');
+                    const stopRecordButton = document.getElementById('stopRecord');
+                    const saveVideoButton = document.getElementById('saveVideo');
+                    const canvas = document.getElementById('canvas');
+                    const context = canvas.getContext('2d');
+
+                    let mediaRecorder;
+                    let recordedChunks = [];
+
+                    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                        .then((stream) => {
+                            video.srcObject = stream;
+                            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+                            mediaRecorder.ondataavailable = (event) => {
+                                if (event.data.size > 0) {
+                                    recordedChunks.push(event.data);
+                                }
+                            };
+
+                            mediaRecorder.onstop = () => {
+                                saveVideoButton.disabled = false;
+                            };
+                        })
+                        .catch((error) => {
+                            console.error('Error accessing media devices:', error);
+                        });
+
+                    startRecordButton.addEventListener('click', () => {
+                        recordedChunks = [];
+                        mediaRecorder.start();
+                        startRecordButton.disabled = true;
+                        stopRecordButton.disabled = false;
+                        saveVideoButton.disabled = true;
+                    });
+
+                    stopRecordButton.addEventListener('click', () => {
+                        mediaRecorder.stop();
+                        startRecordButton.disabled = false;
+                        stopRecordButton.disabled = true;
+                    });
+
+                    saveVideoButton.addEventListener('click', () => {
+                        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+
+                        // Create a FormData object and append the blob data
+                        const formData = new FormData();
+                        formData.append('video', blob);
+
+                        // Use fetch to send the data to the server
+                        fetch('/save_video', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Video saved successfully:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error saving video:', error);
+                        });
+                    });
+                });
+            </script>
+
+
+                    </div>
+                    <p class="sub-el"><i>Language detected...</i></p>
+                </div>
+                <div class="line main-el"></div>
+                <div class="txt main-el">
+                    <p class="sub-el">TRANSLATED TEXT</p>
+                    <textarea type="text" class="sub-el txt-box" placeholder="Sample text goes here..." ></textarea>
+                    <!-- <p class="sub-el">Sample text goes here...</p> -->
+                </div>
+            </div>
+            <div class="toggle"><label class="switch">
+
+<!--                <input type="checkbox">-->
+                <input type="checkbox" id="linkCheckbox" onchange="changeLink()">
+                <span class="slider round"></span>
+                <a id="dynamicLink" href="#">Dynamic Link</a>
+            </label>
+        </div>
+            <script>
+            function changeLink() {
+<!--                console.log("hello")-->
+                var checkbox = document.getElementById('linkCheckbox');
+                var dynamicLink = document.getElementById('dynamicLink');
+
+                if (checkbox.checked) {
+<!--                 console.log("hello")-->
+                    window.location.replace('/text_to_sl');
+                    dynamicLink.href = '{{url_for('text_to_sl')}}'; // Set the link when the checkbox is checked
+                } else {
+                    dynamicLink.href = '#'; // Set a default link (or anchor) when the checkbox is unchecked
+                }
+
+            }
+            </script>
+        </div>
+        </div>
+{% endblock %}

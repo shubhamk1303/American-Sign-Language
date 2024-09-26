@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block data%}
+        <div class="signtotext">
+            <div class="main">
+                <div class="txt main-el">
+                    <p class="sub-el">ENTER TEXT</p>
+                    <form  method="post">
+                        <textarea name="tts" type="text" class="sub-el txt-box" placeholder="Sample text goes here..."></textarea>
+<!--                        <input type="button" class="btn" Value="Translate">-->
+                        <button type="submit" class="btn">Translate</button>
+                    </form>
+
+                </div>
+                <div class="line main-el"></div>
+                <div class="sign main-el">
+                    <p class="sub-el">SIGN GESTURES</p>
+                    <div class="camera sub-el">
+<!--                        <img class="camera-icon sub-el" alt="" src={{url_for('static',filename='images/user.svg')}} />-->
+                        <img class= "immg" src={{url_for('static',filename='results/path_to_output_combined.gif')}}></img>
+                    </div>
+                </div>
+            </div>
+            <div class="toggle"><label class="switch">
+
+
+<!--                <input type="checkbox">-->
+                <input type="checkbox" id="linkCheckbox" onchange="changeLink()">
+                <span class="slider round"></span>
+                <a id="dynamicLink" href="#">Dynamic Link</a>
+            </label>
+        </div>
+            <script>
+            function changeLink() {
+<!--                console.log("hello")-->
+                var checkbox = document.getElementById('linkCheckbox');
+                var dynamicLink = document.getElementById('dynamicLink');
+
+                if (checkbox.checked) {
+<!--                 console.log("hello")-->
+                    window.location.replace('/home');
+                    dynamicLink.href = '{{url_for('home')}}'; // Set the link when the checkbox is checked
+                } else {
+                    dynamicLink.href = '#'; // Set a default link (or anchor) when the checkbox is unchecked
+                }
+
+            }
+            </script>
+        </div>
+        </div>
+        </div>
+{% endblock %}
